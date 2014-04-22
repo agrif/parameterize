@@ -44,7 +44,7 @@ if __name__ == '__main__':
     
     setup(name='parameterize',
           version=find_version(),
-          description='a Python implementation of SRFI 39',
+          description='a Python implementation of parameterize and SRFI 39',
           author='Aaron Griffith',
           author_email='aargri@gmail.com',
           url='http://github.com/agrif/parameterize',
