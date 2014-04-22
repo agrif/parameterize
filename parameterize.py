@@ -48,6 +48,16 @@ _context_local = threading.local()
 # are destroyed, their global entries are removed
 _context_local.dynamic_environment = Environment(weakref.WeakKeyDictionary())
 
+def set_context_locals(ctx):
+    """Sets the context-local storage object used by parameterize. It
+    should be an object with settable attributes with
+    execution-context-dependent values. The default implementation
+    uses threading.local().
+    """
+    global _context_local
+    ctx.dynamic_environment = _context_local.dynamic_environment
+    _context_local = ctx
+
 class EnvironmentProxy(collections.MutableMapping):
     """A dictionary-like object that proxies the current dynamic
     environment, and provides a way to create a sub-environment via
