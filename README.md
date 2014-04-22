@@ -4,6 +4,8 @@ parameterize
 *a Python implementation of [SRFI 39][]*
 
  [SRFI 39]: http://srfi.schemers.org/srfi-39/srfi-39.html
+ 
+[![Build Status](https://travis-ci.org/agrif/parameterize.svg)](https://travis-ci.org/agrif/parameterize)
 
 *parameterize* implements optional dynamic scope and parameter objects
 in Python. It's a spiritual implementation of parameters from Scheme,
