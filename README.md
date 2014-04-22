@@ -36,7 +36,10 @@ their `parameterize()` block.
 Motivating Example
 ------------------
 
-In Python, the `sys.stdout` global variable can be overridden to point to any file-like object to redirect output from built-in output primitives like `print()`. So, there's a nice hacky way to redirect the output of a function:
+In Python, the `sys.stdout` global variable can be overridden to point
+to any file-like object to redirect output from built-in output
+primitives like `print()`. So, there's a nice hacky way to redirect
+the output of a function:
 
 ~~~~{.py}
 with open('output.txt', 'w') as f:

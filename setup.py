@@ -49,6 +49,13 @@ if __name__ == '__main__':
           author_email='aargri@gmail.com',
           url='http://github.com/agrif/parameterize',
           license='MIT',
+          keywords = ['parameters', 'parameterize', 'dynamic scope'],
+          classifiers = [
+              'Development Status :: 3 - Alpha',
+              'License :: OSI Approved :: MIT License',
+              'Programming Language :: Python :: 2.7',
+              'Programming Language :: Python :: 3',
+          ],
           py_modules=['parameterize'],
           test_suite='tests',
           setup_requires = ['setuptools_git >= 0.3'],
