@@ -44,9 +44,6 @@ class Environment(collections.MutableMapping):
 # default to using thread-locals for our execution context local storage
 # and use it to store the current dynamic environment
 _context_local = threading.local()
-# the global environment uses weak key refs, so that when parameters
-# are destroyed, their global entries are removed
-_context_local.dynamic_environment = Environment(weakref.WeakKeyDictionary())
 
 def set_context_locals(ctx):
     """Sets the context-local storage object used by parameterize. It
@@ -55,7 +52,10 @@ def set_context_locals(ctx):
     uses threading.local().
     """
     global _context_local
-    ctx.dynamic_environment = _context_local.dynamic_environment
+    try:
+        ctx.dynamic_environment = _context_local.dynamic_environment
+    except AttributeError:
+        pass
     _context_local = ctx
 
 class EnvironmentProxy(collections.MutableMapping):
@@ -63,16 +63,25 @@ class EnvironmentProxy(collections.MutableMapping):
     environment, and provides a way to create a sub-environment via
     create().
     """
+    @property
+    def _environment(self):
+        global _context_local
+        # the global environment uses weak key refs, so that when parameters
+        # are destroyed, their global entries are removed
+        if not 'dynamic_environment' in dir(_context_local):
+            _context_local.dynamic_environment = Environment(weakref.WeakKeyDictionary())
+        return _context_local.dynamic_environment
+    
     def __getitem__(self, key):
-        return _context_local.dynamic_environment[key]
+        return self._environment[key]
     def __setitem__(self, key, value):
-        _context_local.dynamic_environment[key] = value
+        self._environment[key] = value
     def __delitem__(self, key):
-        del _context_local.dynamic_environment[key]
+        del self._environment[key]
     def __iter__(self):
-        return iter(_context_local.dynamic_environment)
+        return iter(self._environment)
     def __len__(self):
-        return len(_context_local.dynamic_environment)
+        return len(self._environment)
     
     @contextlib.contextmanager
     def create(self, data):
@@ -81,7 +90,8 @@ class EnvironmentProxy(collections.MutableMapping):
         should be a dictionary mapping keys to their values, which
         will be used to seed the new environment.
         """
-        oldenv = _context_local.dynamic_environment
+        global _context_local
+        oldenv = self._environment
         newenv = Environment(data, parent=oldenv)
         _context_local.dynamic_environment = newenv
         try:
@@ -117,12 +127,12 @@ class Parameter(object):
         converter. The converter will be called every time the
         parameter is set.
         """
-        dynamic_environment[self] = converter(default)
+        self._default = converter(default)
         self._converter = converter
     
     def get(self):
         """Get the parameter value."""
-        return dynamic_environment[self]
+        return dynamic_environment.get(self, self._default)
     
     def set(self, value):
         """Set the parameter value."""
